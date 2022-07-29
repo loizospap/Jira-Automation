@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>LOP Jira Backlog</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/css/bootstrap-select.min.css" integrity="sha512-mR/b5Y7FRsKqrYZou7uysnOdCIJib/7r5QeJMFvLNHNhtye3xJp1TdJVPLtetkukFn227nKpXD9OjUc09lx97Q==" crossorigin="anonymous"
+    referrerpolicy="no-referrer" />
+</head>
+<style>
+    .contain{
+        margin: 0 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    @media (min-width: 1200px) {
+    .container{
+        max-width: 1000px;
+        }
+    }
+
+    .content{
+        font-size: 0.7rem;
+    }
+
+    .collapse{
+        border: 1px solid #0d6efd;
+        border-radius: 10px;
+    }
+    /* .col{
+        margin: 0 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        border: 1px solid black;
+    } */
+    div#loading {
+        width: 100%;
+        height: 500px;
+        display: none;
+        background: url(/static/loading.gif) no-repeat;
+        cursor: wait;
+        background-position: center;
+    }
+    .bootstrap-select {
+        width: 330px !important;
+    }
+    .trow{
+        border-top: 1px solid  grey;
+        /* border-bottom: 4px solid  grey; */
+    }
+
+    .trow:hover{
+        background-color: #f5f5f5;
+    }
+
+    .center-wrapper{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .title{
+        width: 100%;
+        text-align: center;
+        font-family: sans-serif;
+        background-image: linear-gradient(45deg, #553c9a, #ee4b2b);
+        font-size: 45px;
+        font-weight: 600;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+    }
+</style>
+<body class="container-xl pt-3 ">
+    
+    <div class="center-wrapper">
+        <div class="d-flex flex-column">
+        <p class="title">LOP Jira Backlog</p>
+        <form action="/backlog/" method="post">
+            <select id="myform" name="myform" class="selectpicker" multiple data-live-search="true">
+                {% for item in initialiseObject["devs"] %}
+                    <option> {{ item.email }} </option>
+                {% endfor %}
+            </select>
+            <button name="forwardBtn" type="submit" class="btn btn-warning" onclick="loading();">Get Backlog</button>
+        </form>
+        </div>
+    </div>
+    <div id="loading"></div>
+    <div id="content">
+        <div class="d-flex flex-column">
+            {% for i in initialiseObject["selected_devs"] %}
+            <br>
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#jira_list{{loop.index}}" aria-expanded="false" aria-controls="jira_list{{loop.index}}">{{i}}</button>
+            <br>
+            <div id="jira_list{{loop.index}}" class="collapse">
+                        <div class="m-2">  
+                            <h6>Search Query</h6>
+                            <p>{{initialiseObject["search_query"][loop.index-1]}}</p>
+                        <div class="table">
+                            <div class="d-flex flex-column">
+                            {% for item in initialiseObject["email_issues"][loop.index-1] %}
+                                <div class="d-flex flex-row trow" style="overflow: auto;">
+                                        <div class="col h-100" ><p class="content">{{ item.type}}</p></div>
+                                        <div class="col h-100" ><a href="https://jsw.ibm.com/browse/{{ item.key }}" target="_blank" class="content">{{ item.key }}</a></div>
+                                        <div class="col h-100" ><p class="content">{{ item.sprint }}</p></div>
+                                        <div class="col-6 h-100"><p class="content">{{ item.title }}</p></div>
+                                        <div class="col h-100" ><p class="content">{{ item.remaining_estimate }}</p></div>
+                                        <div class="col h-100" ><p class="content">{{ item.status }}</p></div>
+                                        <div class="col h-100" ><p class="content">{% if item.highPriority %}✔️{% endif %}</p></div>
+                                    </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js" integrity="sha512-FHZVRMUW9FsXobt+ONiix6Z0tIkxvQfxtCSirkKc5Sb4TKHmqq1dZa8DphF0XqKb3ldLu/wgMa8mT6uXiLlRlw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">// <![CDATA[
+        function loading(){
+            $("#loading").show();
+            $("#content").hide();       
+        }
+// ]]></script>
+</script>
+</html>  
